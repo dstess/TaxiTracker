@@ -8,20 +8,54 @@
         margin: 0px;
         padding: 0px
         }
-        #TopOverlay{
-        z-index: 2;
-	width: 14%;
-	height:20px;
+        #BottomOverlay{
+	z-index: 4;
+	width: 466px;
+	height:70px;
 	display: block;
 	background-color: #FFFFFF;
-	position:absolute;
-	top:0px;
-	right:42%;
-	outline:#0087FF solid thick;
+	position:fixed;
+	bottom:0px;
+	right:33.05%;
+	border-radius:15px
+	}
+	#BottomOutline{
+	z-index:2;	
+	width:465px;
+    	height:70px;
+   	display:block;
+    	border: 4px solid #0087FF;
+    	border-radius: 16px;
+	position:fixed;
+	right:32.7%;
+	bottom:-5px
+	}
+        #TopOverlay{
+        z-index: 4;
+	width: 192px;
+	height:40px;
+	display: block;
+	background-color: #FFFFFF;
+	position:fixed;
+	top:-15px;
+	right:45.6%;
+	border-radius:15px;
         font-size:14px;
         text-decoration:none;
         color:#f60dff
         }
+	#TopOutline{
+	z-index: 2;
+	width: 191px;
+	height:40px;
+	display: block;
+	border: 4px solid #0087FF;
+	border-radius: 15px;
+	position:fixed;
+	top:-20px;
+	right:45.3%;
+	border-radius:15px
+	}
         a{
         font-weight:bold;
         text-decoration:none;
@@ -30,17 +64,6 @@
         a:hover{
         color:#f60dff;
         }
-      #BottomOverlay{
-	z-index: 2;
-	width: 33%;
-	height:70px;
-	display: block;
-	background-color: #FFFFFF;
-	position:absolute;
-	bottom:0px;
-	right:33%;
-	outline:#0087FF solid thick
-	}
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
@@ -102,16 +125,18 @@ google.maps.event.addDomListener(window, 'load', initialize);
     </script>
   </head>
   <body>
+    <div id="BottomOutline"></div>
     <div id="BottomOverlay">
     <form action="" method="get">  {% csrf_token %}
         <input id="markerlat" type="hidden" name="heylat" value="">
         <input id="markerlng" type="hidden" name="heylng" value="">   
     </form>
-    <b> Companies in Area </b>
+    <b style="padding-left:6px"> Companies in Area </b>
     <div id="results"></div>
     </div>
+    <div id="TopOutline"></div>
     <div id="TopOverlay"> 
-    <a href="http://127.0.0.1:8000/" style="padding-left:3px" >Switch to Service Marker View<a> </div>
+    <a href="http://127.0.0.1:8000/" style="padding-left:3px;top:2px;position:fixed;z-index:8" >Switch to Service Marker View<a> </div>
     <div id="map-canvas"></div>
   </body>
 </html>
