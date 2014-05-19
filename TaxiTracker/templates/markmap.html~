@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Service Area Marker</title>
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px;
+	z-index: 1
+      }
+	#BottomOverlay{
+	z-index: 4;
+	width: 465px;
+	height:70px;
+	display: block;
+	background-color: #FFFFFF;
+	position:fixed;
+	bottom:0px;
+	right:33%;
+	border-radius:15px
+	}
+        #TopOverlay{
+        z-index: 2;
+	width: 140px;
+	height:20px;
+	display: block;
+	background-color: #FFFFFF;
+	position:fixed;
+	top:0px;
+	right:46%;
+	outline:#0087FF solid thick;
+	border-radius:15px;
+        font-size:14px;
+        text-decoration:none;
+        color:#f60dff
+        }
+	#BottomOutline{
+	z-index:2;	
+	width:465px;
+    	height:70px;
+   	display:block;
+    	border: 4px solid #0087FF;
+    	border-radius: 16px;
+	position:fixed;
+	right:32.7%;
+	bottom:-5px
+	}
+        a{
+        font-weight:bold;
+        text-decoration:none;
+	color: #0087FF
+        }
+        a:hover{
+        color:#f60dff;
+        }
+        #Coordinates{
+	position:absolute;
+	bottom:-10px;
+	right:35%;
+	z-index:6
+	}
+	#NameBox{
+	position:absolute;
+	left:60px;
+	top:1%
+	}
+	#SaveBox{
+	position:absolute;
+	left:190px;
+	top:1%
+	}
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script>
+
+   var rectangle;
+   var map;
+   var infoWindow;
+   var RectExists = 0;
+
+function initialize() {
+  //creates map and set initial location (bay area)
+  var mapOptions = {
+    center: new google.maps.LatLng(37.6666, -121.9112),
+    zoom: 10
+  };
+  map = new google.maps.Map(document.getElementById('map-canvas'),
+      mapOptions);
+
+}
+
+function createRect() {
+   //Checks to see if rectangle already exists and then deletes it
+   if (RectExists == 1){
+     rectangle.setMap(null);
+     RectExists = 0;
+   }
+   //Uses getCenter() to create a rectangle in center of user's view
+   else{
+      var TopCornerLat = map.getCenter().lat() - .05;
+      var TopCornerLng = map.getCenter().lng() - .1;
+      var BottomCornerLat = map.getCenter().lat() + .05;
+      var BottomCornerLng = map.getCenter().lng() + .1;
+      //Sets the top left + bottom right corners
+      var bounds = new google.maps.LatLngBounds(
+        new google.maps.LatLng(TopCornerLat, TopCornerLng),
+        new google.maps.LatLng(BottomCornerLat, BottomCornerLng)
+      );
+
+  // Creates editable + draggable rectangle
+       rectangle = new google.maps.Rectangle({
+       bounds: bounds,
+       editable: true,
+       draggable: true,
+       fillColor: '#0087FF',
+    });
+
+    rectangle.setMap(map);
+    
+    google.maps.event.addListener(rectangle, 'bounds_changed', showNewRect); //If initial rectangle is editted or moved, calls showNewRect()
+
+    RectExists = 1; //boolean to prevent the user from creating an endless amount of rectangles
+  }
+}
+
+
+function showNewRect(event) { //Called every time rectangle is moved/edited, updates the Coordinates in HTML + the hidden values in the submit form
+  var ne = rectangle.getBounds().getNorthEast(); 
+  var sw = rectangle.getBounds().getSouthWest();  
+  var nelat = ne.lat();
+  var nelng = ne.lng();
+  var swlat = sw.lat();
+  var swlng = sw.lng();
+  var contentString = 
+      'North-east Corner: ' + nelat + ', ' + nelng + '<br>' +
+      'South-west Corner: ' + swlat + ', ' + swlng;
+  document.getElementById("Coordinates").innerHTML = contentString;
+  document.getElementById('nelat').value = nelat;
+  document.getElementById('nelng').value = nelng;
+  document.getElementById('swlat').value = swlat;
+  document.getElementById('swlng').value = swlng;
+  
+}
+function changeButton() //After user presses create, button text switches to delete. Also sets the initial coordinates in the HTML & deletes them if no rectangle exists.
+{
+  var elem = document.getElementById("Create");
+  if (elem.value=="Delete"){
+     elem.value = "Create";
+     document.getElementById("Coordinates").innerHTML = "";
+  }
+  else {
+     elem.value = "Delete";
+  }
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+  </head>
+  <body>
+    <p id="Coordinates"></p> 
+    <div id="BottomOutline"></div>
+    <div id="BottomOverlay">
+        <input id="Create" type="button" value="Create" onclick="createRect();changeButton();" />
+    <form action="" method="post">  {% csrf_token %}
+     	<input id="NameBox" type="text" placeholder="Enter Company Name" name="companyname" value={{companyname}} >
+        <input id="nelat" type="hidden" name="nelat" value="">
+        <input id="nelng" type="hidden" name="nelng" value="">
+        <input id="swlat" type="hidden" name="swlat" value="">
+        <input id="swlng" type="hidden" name="swlng" value="">
+        <input id="SaveBox" type="submit" value="Save">
+    </form>
+    </div>
+    <div id="TopOverlay"> 
+    <a href="/querymap/" style="padding-left:3px" >Switch to Search Map<a> </div>
+    <div id="map-canvas"></div>
+  </body>
+</html>

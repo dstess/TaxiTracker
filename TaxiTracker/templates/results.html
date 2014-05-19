@@ -1,0 +1,16 @@
+{% if results|length %}
+	<table>
+	<tr> 
+		<td>
+		<strong>Found {{ results|length }} companies</strong>
+		</td>
+	</tr>
+	{% for a in results %}
+		{{ a.companyname }} 
+	{% endfor %}
+	</table>
+{% else %}
+	<div class="nonereturned">
+	No companies serve this area.
+	</div>
+{% endif %}

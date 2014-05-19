@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Query Map</title>
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+        }
+        #TopOverlay{
+        z-index: 2;
+	width: 14%;
+	height:20px;
+	display: block;
+	background-color: #FFFFFF;
+	position:absolute;
+	top:0px;
+	right:42%;
+	outline:#0087FF solid thick;
+        font-size:14px;
+        text-decoration:none;
+        color:#f60dff
+        }
+        a{
+        font-weight:bold;
+        text-decoration:none;
+	color: #0087FF
+        }
+        a:hover{
+        color:#f60dff;
+        }
+      #BottomOverlay{
+	z-index: 2;
+	width: 33%;
+	height:70px;
+	display: block;
+	background-color: #FFFFFF;
+	position:absolute;
+	bottom:0px;
+	right:33%;
+	outline:#0087FF solid thick
+	}
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script>
+// In the following example, markers appear when the user clicks on the map.
+// The markers are stored in an array.
+// The user can then click an option to hide, show or delete the markers.
+var map;
+var markers = [];
+
+function initialize() {
+  var mapOptions = {
+    zoom: 10,
+    center: new google.maps.LatLng(37.6666, -121.9112) //set position to Bay Area
+  };
+  map = new google.maps.Map(document.getElementById('map-canvas'),
+      mapOptions);
+  google.maps.event.addListener(map, 'click', function(event) { // User clicks on map
+    deleteMarkers(); //Gets rid of previous marker
+    var marker = new google.maps.Marker({ //new marker
+         position:event.latLng, 
+         map:map
+    });
+       markers.push(marker); //stack used in delete function
+       var eventlat = event.latLng.lat(); 
+       var eventlng = event.latLng.lng();
+       var infowindow = new google.maps.InfoWindow({   //creates infowindow with coordinates
+       content: eventlat + "," + eventlng
+       }); 
+       infowindow.open(map, marker); //infowindow tied to marker
+       $( '#results' ).html( '&nbsp;' ).load( 'users/?q=' + eventlat + "&x=" +eventlng); //jquery call to update the results div at the bottom with the ajax result
+       
+  });     
+}
+
+query_please = null;
+
+// Sets the map on all markers in the array. Left in from Google Maps API
+function setAllMap(map) {
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(map);
+  }
+}
+
+function clearMarkers() {
+  setAllMap(null);
+}
+
+// Deletes all markers in the array by removing references to them.
+function deleteMarkers() {
+  clearMarkers();
+  markers = [];
+}
+
+
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+  </head>
+  <body>
+    <div id="BottomOverlay">
+    <form action="" method="get">  {% csrf_token %}
+        <input id="markerlat" type="hidden" name="heylat" value="">
+        <input id="markerlng" type="hidden" name="heylng" value="">   
+    </form>
+    <b> Companies in Area </b>
+    <div id="results"></div>
+    </div>
+    <div id="TopOverlay"> 
+    <a href="http://127.0.0.1:8000/" style="padding-left:3px" >Switch to Service Marker View<a> </div>
+    <div id="map-canvas"></div>
+  </body>
+</html>
