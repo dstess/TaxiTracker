@@ -3,7 +3,7 @@ TaxiTracker
 
 Created by Dave Stess (2014) using Django, Google Maps API, Javascript, MySQL, and a dash of AJAX
 
---AWS Deployment Coming Soon--
+--Update: TaxiTracker is now up on AWS. http://taxitracker-env-3jpgqybxu2.elasticbeanstalk.com/
 
 Welcome to Taxi Tracker! There are two sides of the app - one for taxi companies and the other for potential customers.
 
